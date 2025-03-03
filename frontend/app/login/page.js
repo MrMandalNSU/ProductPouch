@@ -9,6 +9,7 @@ import {
   Text,
   Anchor,
   Center,
+  Group,
 } from "@mantine/core";
 import { IconMail, IconLock } from "@tabler/icons-react";
 import Link from "next/link";
@@ -34,25 +35,33 @@ export default function Login() {
         <Paper withBorder shadow="md" p="xl" radius="md" w={350}>
           <form onSubmit={handleSubmit}>
             <TextInput
-              label="Email"
-              placeholder="Enter your email"
+              label=""
+              placeholder="Email"
               icon={<IconMail size={16} />}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
             <PasswordInput
-              label="Password"
-              placeholder="Enter your password"
+              label=""
+              placeholder="Password"
               icon={<IconLock size={16} />}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               mt="md"
             />
-            <Button type="submit" fullWidth mt="md" color="indigo">
-              LOGIN
-            </Button>
+            <Group justify="center" mt="md">
+              <Button
+                type="submit"
+                justify="center"
+                size="compact-md"
+                mt="md"
+                color="indigo"
+              >
+                LOGIN
+              </Button>
+            </Group>
           </form>
 
           {/* Signup Link */}

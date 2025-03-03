@@ -54,8 +54,8 @@ export default function Signup() {
             <Group grow>
               <TextInput
                 name="firstName"
-                label="First Name"
-                placeholder="John"
+                label=""
+                placeholder="First Name"
                 icon={<IconUser size={16} />}
                 value={form.firstName}
                 onChange={handleChange}
@@ -63,8 +63,8 @@ export default function Signup() {
               />
               <TextInput
                 name="lastName"
-                label="Last Name"
-                placeholder="Doe"
+                label=""
+                placeholder="Last Name"
                 icon={<IconUser size={16} />}
                 value={form.lastName}
                 onChange={handleChange}
@@ -74,8 +74,8 @@ export default function Signup() {
 
             <TextInput
               name="address"
-              label="Address"
-              placeholder="123 Main St"
+              label=""
+              placeholder="Address"
               icon={<IconHome size={16} />}
               value={form.address}
               onChange={handleChange}
@@ -86,8 +86,8 @@ export default function Signup() {
             <Group grow mt="md">
               <TextInput
                 name="email"
-                label="Email"
-                placeholder="johndoe@example.com"
+                label=""
+                placeholder="Email"
                 icon={<IconAt size={16} />}
                 value={form.email}
                 onChange={handleChange}
@@ -95,8 +95,8 @@ export default function Signup() {
               />
               <TextInput
                 name="phone"
-                label="Phone Number"
-                placeholder="123-456-7890"
+                label=""
+                placeholder="Phone Number"
                 icon={<IconPhone size={16} />}
                 value={form.phone}
                 onChange={handleChange}
@@ -106,8 +106,8 @@ export default function Signup() {
 
             <PasswordInput
               name="password"
-              label="Password"
-              placeholder="Enter password"
+              label=""
+              placeholder="Password"
               icon={<IconLock size={16} />}
               value={form.password}
               onChange={handleChange}
@@ -116,8 +116,8 @@ export default function Signup() {
             />
             <PasswordInput
               name="confirmPassword"
-              label="Confirm Password"
-              placeholder="Re-enter password"
+              label=""
+              placeholder="Confirm Password"
               icon={<IconLock size={16} />}
               value={form.confirmPassword}
               onChange={handleChange}
@@ -125,9 +125,17 @@ export default function Signup() {
               mt="md"
             />
 
-            <Button type="submit" fullWidth mt="md" color="indigo">
-              REGISTER
-            </Button>
+            <Group justify="center" mt="md">
+              <Button
+                type="submit"
+                justify="center"
+                size="compact-md"
+                mt="md"
+                color="indigo"
+              >
+                REGISTER
+              </Button>
+            </Group>
           </form>
 
           {/* Login Link */}
