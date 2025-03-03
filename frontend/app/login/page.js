@@ -1,56 +1,78 @@
 "use client";
 
 import { useState } from "react";
+import {
+  TextInput,
+  PasswordInput,
+  Button,
+  Paper,
+  Text,
+  Anchor,
+  Center,
+  Group,
+} from "@mantine/core";
+import { IconMail, IconLock } from "@tabler/icons-react";
 import Link from "next/link";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Login clicked with:", { email, password });
   };
 
   return (
-    <div className="flex h-screen justify-center items-center bg-gray-100">
-      <div className="relative flex flex-col items-center">
-        <h2 className="text-3xl font mb-4 text-black">SIGN IN</h2>
+    <Center style={{ height: "100vh", backgroundColor: "#f8f9fa" }}>
+      <div>
+        {/* Sign In Heading */}
+        <Text align="center" size="xl" weight={700} mb="md">
+          SIGN IN
+        </Text>
 
         {/* Login Box */}
-        <div className="bg-white p-15 border border-gray-300 shadow-md w-100">
+        <Paper withBorder shadow="md" p="xl" radius="md" w={350}>
           <form onSubmit={handleSubmit}>
-            <input
-              type="email"
+            <TextInput
+              label=""
               placeholder="Email"
-              className="w-full p-3 border border-gray-300 rounded mb-4 text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              icon={<IconMail size={16} />}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
-            <input
-              type="password"
+            <PasswordInput
+              label=""
               placeholder="Password"
-              className="w-full p-3 border border-gray-300 rounded mb-6 text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              icon={<IconLock size={16} />}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              mt="md"
             />
-            <button
-              type="submit"
-              className="w-25 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold p-3 rounded transition mx-auto block"
-            >
-              LOGIN
-            </button>
+            <Group justify="center" mt="md">
+              <Button
+                type="submit"
+                justify="center"
+                size="compact-md"
+                mt="md"
+                color="indigo"
+              >
+                LOGIN
+              </Button>
+            </Group>
           </form>
-          <p className="text-center text-gray-600 mt-4">
+
+          {/* Signup Link */}
+          <Text align="center" size="sm" mt="md">
             Don’t have an account?{" "}
-            <Link href="/signup" className="text-blue-500 font-semibold">
+            <Anchor component={Link} href="/signup" color="blue">
               Signup
-            </Link>
-          </p>
-        </div>
+            </Anchor>
+          </Text>
+        </Paper>
       </div>
-    </div>
+    </Center>
   );
 }
