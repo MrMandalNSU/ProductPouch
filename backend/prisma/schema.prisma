@@ -17,4 +17,28 @@ model User {
   password   String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @default(now())
+
+  //relations
+  owner Product[] @relation("owner")
+  buyer Product[] @relation("buyer")
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  title       String
+  categories  String[]
+  description String
+  price       Float
+  rent_price  Float
+  rent_period String
+  views       Int?     @default(0)
+  status      String?  @default("available")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+
+  //relations
+  owner    User  @relation("owner", fields: [owner_id], references: [id])
+  owner_id Int
+  buyer    User? @relation("buyer", fields: [buyer_id], references: [id])
+  buyer_id Int?
 }
