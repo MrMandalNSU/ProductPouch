@@ -29,7 +29,7 @@ export default function ProductsPage() {
   }, []);
 
   // Execute the GraphQL query
-  const { loading, error, data } = useQuery(GET_USER_PRODUCTS, {
+  const { loading, error, data, refetch } = useQuery(GET_USER_PRODUCTS, {
     variables: { userId },
     skip: !userId, // Skip the query until userId is available
   });
@@ -41,27 +41,31 @@ export default function ProductsPage() {
   const products = data?.user?.owner || [];
 
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return `${date.getDate()}${getOrdinalSuffix(date.getDate())} ${getMonthName(
-      date.getMonth()
-    )} ${date.getFullYear()}`;
-  };
+    const timestamp = Number(dateString);
+    const date = new Date(timestamp);
 
-  const getOrdinalSuffix = (day) => {
-    if (day > 3 && day < 21) return "th";
-    switch (day % 10) {
-      case 1:
-        return "st";
-      case 2:
-        return "nd";
-      case 3:
-        return "rd";
-      default:
-        return "th";
+    if (isNaN(date.getTime())) {
+      return "Invalid Date";
     }
-  };
 
-  const getMonthName = (month) => {
+    const day = date.getDate();
+    const month = date.getMonth();
+    const year = date.getFullYear();
+
+    const getOrdinalSuffix = (day) => {
+      if (day > 3 && day < 21) return "th";
+      switch (day % 10) {
+        case 1:
+          return "st";
+        case 2:
+          return "nd";
+        case 3:
+          return "rd";
+        default:
+          return "th";
+      }
+    };
+
     const months = [
       "January",
       "February",
@@ -76,7 +80,8 @@ export default function ProductsPage() {
       "November",
       "December",
     ];
-    return months[month];
+
+    return `${day}${getOrdinalSuffix(day)} ${months[month]} ${year}`;
   };
 
   return (
