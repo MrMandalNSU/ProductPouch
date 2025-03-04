@@ -1,14 +1,31 @@
 const express = require("express");
-const cors = require("cors");
-require("dotenv").config();
+const { ApolloServer } = require("apollo-server-express");
+const typeDefs = require("./schema");
+const resolvers = require("./resolvers");
 
-const app = express();
-app.use(express.json());
-app.use(cors());
+async function startServer() {
+  const app = express();
 
-app.get("/", (req, res) => {
-  res.send("API is running...");
-});
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    context: ({ req }) => {
+      // Here you can add context like authentication
+      return { req };
+    },
+  });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  await server.start();
+
+  server.applyMiddleware({ app });
+
+  const PORT = process.env.PORT || 4000;
+
+  app.listen(PORT, () => {
+    console.log(
+      `Server running at http://localhost:${PORT}${server.graphqlPath}`
+    );
+  });
+}
+
+startServer();

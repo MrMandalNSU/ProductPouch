@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  first_name String
+  last_name  String?
+  address    String?
+  email      String   @unique
+  phone      String?
+  password   String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+
+  //relations
+  owner  Product[] @relation("owner")
+  buyer  Product[] @relation("buyer")
+  rental Rental[]  @relation("renter")
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  title       String
+  categories  String[]
+  description String
+  price       Float
+  rent_price  Float
+  rent_period String
+  views       Int?     @default(0)
+  status      String?  @default("available")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+
+  //relations
+  owner    User     @relation("owner", fields: [owner_id], references: [id])
+  owner_id Int
+  buyer    User?    @relation("buyer", fields: [buyer_id], references: [id])
+  buyer_id Int?
+  rental   Rental[] @relation("rental")
+}
+
+model Rental {
+  id        Int    @id @default(autoincrement())
+  rent_from String
+  rent_to   String
+
+  //relations
+  product    Product @relation("rental", fields: [product_id], references: [id])
+  product_id Int
+  renter     User    @relation("renter", fields: [renter_id], references: [id])
+  renter_id  Int
+}
