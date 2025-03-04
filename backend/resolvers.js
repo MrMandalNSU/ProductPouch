@@ -1,4 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
+import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 const resolvers = {
@@ -126,7 +126,30 @@ const resolvers = {
         where: { id },
       });
     },
+
+    // Login mutation
+    login: async (_, { email, password }) => {
+      const user = await prisma.user.findUnique({
+        where: { email },
+      });
+
+      if (!user) {
+        throw new Error("No user found with this email");
+      }
+
+      if (password !== user.password) {
+        throw new Error("Invalid password");
+      }
+
+      // Simple-Token
+      const token = `token-${user.id}-${Date.now()}`;
+
+      return {
+        token,
+        user,
+      };
+    },
   },
 };
 
-module.exports = resolvers;
+export default resolvers;
