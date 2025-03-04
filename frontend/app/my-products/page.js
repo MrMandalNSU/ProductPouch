@@ -9,9 +9,7 @@ import {
   Button,
   Group,
   ActionIcon,
-  Badge,
   Flex,
-  Box,
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
 import { useQuery } from "@apollo/client";
@@ -24,7 +22,7 @@ export default function ProductsPage() {
   useEffect(() => {
     // Get the token and user info from localStorage
     const user = JSON.parse(localStorage.getItem("user") || "{}");
-    setUserId(user.id || null); // Default to 1 for testing if no user id found
+    setUserId(user.id || null);
   }, []);
 
   // Execute the GraphQL query
@@ -33,17 +31,12 @@ export default function ProductsPage() {
     skip: !userId, // Skip the query until userId is available
   });
 
-  // Handle loading state
   if (loading) return <Text>Loading products...</Text>;
-
-  // Handle error state
   if (error)
     return <Text color="red">Error loading products: {error.message}</Text>;
 
-  // Get products from the response
   const products = data?.user?.owner || [];
 
-  // Function to format date
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return `${date.getDate()}${getOrdinalSuffix(date.getDate())} ${getMonthName(
@@ -51,7 +44,6 @@ export default function ProductsPage() {
     )} ${date.getFullYear()}`;
   };
 
-  // Helper function to get ordinal suffix
   const getOrdinalSuffix = (day) => {
     if (day > 3 && day < 21) return "th";
     switch (day % 10) {
@@ -66,7 +58,6 @@ export default function ProductsPage() {
     }
   };
 
-  // Helper function to get month name
   const getMonthName = (month) => {
     const months = [
       "January",
@@ -88,7 +79,9 @@ export default function ProductsPage() {
   return (
     <Container size="md" py="xl">
       <Flex justify="space-between" align="center" mb="lg">
-        <Title order={1}>MY PRODUCTS</Title>
+        <Title order={1} style={{ flex: 1, textAlign: "center" }}>
+          MY PRODUCTS
+        </Title>
         <Button component="a" href="/logout" color="red">
           LOGOUT
         </Button>
@@ -112,12 +105,10 @@ export default function ProductsPage() {
                 ? product.categories.join(", ")
                 : product.categories}
             </Text>
-
             <Text size="sm" mb="xs">
               Price: ${product.price} | Rent: ${product.rent_price}{" "}
               {product.rent_period}
             </Text>
-
             <Text mb="md">{product.description}</Text>
 
             <Flex justify="space-between" align="center">
