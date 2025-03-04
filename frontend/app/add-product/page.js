@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TextInput,
   MultiSelect,
@@ -14,9 +14,22 @@ import {
   Box,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import Link from "next/link";
+import { useMutation } from "@apollo/client";
+import { CREATE_PRODUCT } from "../../graphql/mutations";
+import { useRouter } from "next/navigation";
 
 export default function CreateProductPage() {
+  const router = useRouter();
   const [active, setActive] = useState(0);
+  const [error, setError] = useState("");
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    // Get the token and user info from localStorage
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    setUserId(user.id || null);
+  }, []);
 
   const form = useForm({
     initialValues: {
@@ -62,9 +75,40 @@ export default function CreateProductPage() {
     setActive((current) => (current > 0 ? current - 1 : current));
   };
 
+  // Apollo mutation hook
+  const [createProduct, { loading }] = useMutation(CREATE_PRODUCT, {
+    onCompleted: (data) => {
+      console.log("Product Created: ", data);
+      router.push("/my-products");
+    },
+    onError: (error) => {
+      console.error("Error creating user:", error);
+      setError(error.message || "An error occurred during signup.");
+    },
+  });
+
   const handleSubmit = (values) => {
     console.log("Product submitted:", values);
-    // TODO: Implement your GraphQL mutation here
+
+    setError("");
+
+    // GraphQL input structure
+    const userInput = {
+      owner_id: userId,
+      title: values.title,
+      description: values.description,
+      categories: values.categories,
+      price: values.price,
+      rent_price: values.rentPrice,
+      rent_period: values.rentPeriod,
+    };
+
+    // Trigger mutation
+    createProduct({
+      variables: {
+        input: userInput,
+      },
+    });
   };
 
   return (

@@ -49,3 +49,17 @@ export const GET_USER_PRODUCTS = gql`
     }
   }
 `;
+
+export const CREATE_PRODUCT = gql`
+  mutation CreateProduct($input: CreateProductInput!) {
+    createProduct(input: $input) {
+      owner_id
+      title
+      description
+      categories
+      price
+      rent_price
+      rent_period
+    }
+  }
+`;
