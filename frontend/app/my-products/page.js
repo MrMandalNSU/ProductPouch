@@ -14,10 +14,12 @@ import {
 import { IconTrash } from "@tabler/icons-react";
 import { useQuery } from "@apollo/client";
 import { GET_USER_PRODUCTS } from "../../graphql/mutations";
+import { useRouter } from "next/navigation";
 
 export default function ProductsPage() {
   // Get userId from localStorage
   const [userId, setUserId] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
     // Get the token and user info from localStorage
@@ -130,7 +132,13 @@ export default function ProductsPage() {
       )}
 
       <Group position="right" mt="xl">
-        <Button>Add Product</Button>
+        <Button
+          onClick={() => {
+            router.push("/add-product");
+          }}
+        >
+          Add Product
+        </Button>
       </Group>
     </Container>
   );
