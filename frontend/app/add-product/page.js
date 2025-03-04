@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import {
   TextInput,
-  Select,
+  MultiSelect,
   Textarea,
   NumberInput,
   Stepper,
@@ -20,7 +20,7 @@ export default function CreateProductPage() {
   const form = useForm({
     initialValues: {
       title: "",
-      categories: [], // Use empty array instead of null
+      categories: [], // Ensure this is always an array
       description: "",
       price: 0,
       rentPrice: 0,
@@ -73,7 +73,7 @@ export default function CreateProductPage() {
         </Stepper.Step>
 
         <Stepper.Step label="Categories">
-          <Select
+          <MultiSelect
             label="Product Categories"
             placeholder="Select categories"
             data={[
@@ -82,7 +82,6 @@ export default function CreateProductPage() {
               { value: "Clothing", label: "Clothing" },
               { value: "Books", label: "Books" },
             ]}
-            multiple
             {...form.getInputProps("categories")}
           />
         </Stepper.Step>
@@ -115,7 +114,7 @@ export default function CreateProductPage() {
           <Text>Title: {form.values.title}</Text>
           <Text>
             Categories:{" "}
-            {Array.isArray(form.values.categories)
+            {form.values.categories.length > 0
               ? form.values.categories.join(", ")
               : "No categories selected"}
           </Text>
