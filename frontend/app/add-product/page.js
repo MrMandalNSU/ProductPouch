@@ -6,6 +6,7 @@ import {
   MultiSelect,
   Textarea,
   NumberInput,
+  Select,
   Stepper,
   Button,
   Group,
@@ -20,10 +21,11 @@ export default function CreateProductPage() {
   const form = useForm({
     initialValues: {
       title: "",
-      categories: [], // Ensure this is always an array
+      categories: [],
       description: "",
       price: 0,
       rentPrice: 0,
+      rentPeriod: "daily", // Default rent period
     },
     validate: {
       title: (value) => (value.trim().length > 0 ? null : "Title is required"),
@@ -34,6 +36,10 @@ export default function CreateProductPage() {
       price: (value) => (value > 0 ? null : "Price must be greater than 0"),
       rentPrice: (value) =>
         value >= 0 ? null : "Rent price cannot be negative",
+      rentPeriod: (value) =>
+        ["daily", "weekly", "monthly", "yearly"].includes(value)
+          ? null
+          : "Invalid rent period",
     },
   });
 
@@ -101,12 +107,25 @@ export default function CreateProductPage() {
             prefix="$"
             {...form.getInputProps("price")}
           />
-          <NumberInput
-            label="Rent Price"
-            placeholder="Enter rent price per day"
-            prefix="$"
-            {...form.getInputProps("rentPrice")}
-          />
+          <Group grow>
+            <NumberInput
+              label="Rent Price"
+              placeholder="Enter rent price"
+              prefix="$"
+              {...form.getInputProps("rentPrice")}
+            />
+            <Select
+              label="Rent Period"
+              placeholder="Select rent period"
+              data={[
+                { value: "daily", label: "Daily" },
+                { value: "weekly", label: "Weekly" },
+                { value: "monthly", label: "Monthly" },
+                { value: "yearly", label: "Yearly" },
+              ]}
+              {...form.getInputProps("rentPeriod")}
+            />
+          </Group>
         </Stepper.Step>
 
         <Stepper.Step label="Summary">
@@ -120,7 +139,9 @@ export default function CreateProductPage() {
           </Text>
           <Text>Description: {form.values.description}</Text>
           <Text>Purchase Price: ${form.values.price}</Text>
-          <Text>Rent Price: ${form.values.rentPrice} per day</Text>
+          <Text>
+            Rent Price: ${form.values.rentPrice} {form.values.rentPeriod}
+          </Text>
         </Stepper.Step>
       </Stepper>
 
