@@ -28,3 +28,38 @@ export const LOGIN_USER = gql`
     }
   }
 `;
+
+export const GET_USER_PRODUCTS = gql`
+  query Products($userId: Int!) {
+    user(id: $userId) {
+      owner {
+        id
+        title
+        price
+        description
+        categories
+        rent_period
+        rent_price
+        status
+        views
+        owner_id
+        createdAt
+        updatedAt
+      }
+    }
+  }
+`;
+
+export const CREATE_PRODUCT = gql`
+  mutation CreateProduct($input: CreateProductInput!) {
+    createProduct(input: $input) {
+      owner_id
+      title
+      description
+      categories
+      price
+      rent_price
+      rent_period
+    }
+  }
+`;

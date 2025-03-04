@@ -9,11 +9,13 @@ A simple application featuring product buy, sell and rental functionalities
 - Frontend setup with next, react, mantine UI
 - Login/sign-up page
 - Integrate login & sign-up page with apollo gql
+- Navigation bar with logout
+- Create my product page
+- Create product creation page with mantine form
 
 ## To-DO 👉
 
 - Create all product page
-- Create product creation page with mantine form
+- Product edit page
 - Integrate product functionalities buy/sell/rent
-- Create my product page
 - Integrate product CRUD functionalities

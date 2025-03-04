@@ -35,7 +35,7 @@ export default function Login() {
       // Use the auth context to login
       authLogin(data.login.user, data.login.token);
 
-      router.push("/");
+      router.push("/my-products");
     },
     onError: (error) => {
       console.error("Login error:", error);
