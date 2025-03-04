@@ -1,23 +1,34 @@
-const express = require("express");
-const { ApolloServer } = require("apollo-server-express");
-const typeDefs = require("./schema");
-const resolvers = require("./resolvers");
+import express from "express";
+import { ApolloServer } from "apollo-server-express";
+import cors from "cors";
+import typeDefs from "./schema.js";
+import resolvers from "./resolvers.js";
 
 async function startServer() {
   const app = express();
+
+  // Configure CORS
+  app.use(
+    cors({
+      origin: ["http://localhost:3000", "https://studio.apollographql.com"],
+      credentials: true,
+    })
+  );
 
   const server = new ApolloServer({
     typeDefs,
     resolvers,
     context: ({ req }) => {
-      // Here you can add context like authentication
       return { req };
     },
   });
 
   await server.start();
 
-  server.applyMiddleware({ app });
+  server.applyMiddleware({
+    app,
+    cors: false,
+  });
 
   const PORT = process.env.PORT || 4000;
 

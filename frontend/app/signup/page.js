@@ -10,6 +10,8 @@ import {
   Anchor,
   Center,
   Group,
+  LoadingOverlay,
+  Alert,
 } from "@mantine/core";
 import {
   IconUser,
@@ -17,10 +19,16 @@ import {
   IconPhone,
   IconLock,
   IconHome,
+  IconAlertCircle,
 } from "@tabler/icons-react";
 import Link from "next/link";
+import { useMutation } from "@apollo/client";
+import { CREATE_USER } from "../../graphql/mutations";
+import { useRouter } from "next/navigation";
 
 export default function Signup() {
+  const router = useRouter();
+  const [error, setError] = useState("");
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -31,13 +39,48 @@ export default function Signup() {
     confirmPassword: "",
   });
 
+  // Apollo mutation hook
+  const [createUser, { loading }] = useMutation(CREATE_USER, {
+    onCompleted: (data) => {
+      console.log("User created:", data);
+      router.push("/login");
+    },
+    onError: (error) => {
+      console.error("Error creating user:", error);
+      setError(error.message || "An error occurred during signup.");
+    },
+  });
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Signup clicked with:", form);
+    setError("");
+
+    // Password confirmation validation
+    if (form.password !== form.confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    // GraphQL input structure
+    const userInput = {
+      first_name: form.firstName,
+      last_name: form.lastName,
+      address: form.address,
+      email: form.email,
+      phone: form.phone,
+      password: form.password,
+    };
+
+    // Trigger mutation
+    createUser({
+      variables: {
+        input: userInput,
+      },
+    });
   };
 
   return (
@@ -49,7 +92,15 @@ export default function Signup() {
         </Text>
 
         {/* Signup Box */}
-        <Paper withBorder shadow="md" p="xl" radius="md" w={600}>
+        <Paper withBorder shadow="md" p="xl" radius="md" w={600} pos="relative">
+          <LoadingOverlay visible={loading} />
+
+          {error && (
+            <Alert icon={<IconAlertCircle size={16} />} color="red" mb="md">
+              {error}
+            </Alert>
+          )}
+
           <form onSubmit={handleSubmit}>
             <Group grow>
               <TextInput
@@ -68,7 +119,6 @@ export default function Signup() {
                 icon={<IconUser size={16} />}
                 value={form.lastName}
                 onChange={handleChange}
-                required
               />
             </Group>
 
@@ -79,7 +129,6 @@ export default function Signup() {
               icon={<IconHome size={16} />}
               value={form.address}
               onChange={handleChange}
-              required
               mt="md"
             />
 
@@ -100,7 +149,6 @@ export default function Signup() {
                 icon={<IconPhone size={16} />}
                 value={form.phone}
                 onChange={handleChange}
-                required
               />
             </Group>
 
@@ -132,6 +180,7 @@ export default function Signup() {
                 size="compact-md"
                 mt="md"
                 color="indigo"
+                loading={loading}
               >
                 REGISTER
               </Button>

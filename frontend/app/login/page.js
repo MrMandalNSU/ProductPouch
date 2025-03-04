@@ -10,17 +10,50 @@ import {
   Anchor,
   Center,
   Group,
+  Alert,
+  LoadingOverlay,
 } from "@mantine/core";
-import { IconMail, IconLock } from "@tabler/icons-react";
+import { IconMail, IconLock, IconAlertCircle } from "@tabler/icons-react";
 import Link from "next/link";
+import { useMutation } from "@apollo/client";
+import { LOGIN_USER } from "../../graphql/mutations";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../../context/auth-context";
 
 export default function Login() {
+  const router = useRouter();
+  const { login: authLogin } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  // Apollo login mutation
+  const [loginMutation, { loading }] = useMutation(LOGIN_USER, {
+    onCompleted: (data) => {
+      console.log("Login successful:", data);
+
+      // Use the auth context to login
+      authLogin(data.login.user, data.login.token);
+
+      router.push("/");
+    },
+    onError: (error) => {
+      console.error("Login error:", error);
+      setError(error.message || "Invalid email or password");
+    },
+  });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Login clicked with:", { email, password });
+    setError("");
+
+    // Triggers login mutation
+    loginMutation({
+      variables: {
+        email,
+        password,
+      },
+    });
   };
 
   return (
@@ -32,7 +65,15 @@ export default function Login() {
         </Text>
 
         {/* Login Box */}
-        <Paper withBorder shadow="md" p="xl" radius="md" w={350}>
+        <Paper withBorder shadow="md" p="xl" radius="md" w={350} pos="relative">
+          <LoadingOverlay visible={loading} />
+
+          {error && (
+            <Alert icon={<IconAlertCircle size={16} />} color="red" mb="md">
+              {error}
+            </Alert>
+          )}
+
           <form onSubmit={handleSubmit}>
             <TextInput
               label=""
@@ -58,6 +99,7 @@ export default function Login() {
                 size="compact-md"
                 mt="md"
                 color="indigo"
+                loading={loading}
               >
                 LOGIN
               </Button>
@@ -66,7 +108,7 @@ export default function Login() {
 
           {/* Signup Link */}
           <Text align="center" size="sm" mt="md">
-            Don’t have an account?{" "}
+            Don't have an account?{" "}
             <Anchor component={Link} href="/signup" color="blue">
               Signup
             </Anchor>
