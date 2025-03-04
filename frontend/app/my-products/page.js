@@ -1,5 +1,6 @@
 "use client";
 
+import Navbar from "@/components/Navbar";
 import { useState, useEffect } from "react";
 import {
   Container,
@@ -79,67 +80,67 @@ export default function ProductsPage() {
   };
 
   return (
-    <Container size="md" py="xl">
-      <Flex justify="space-between" align="center" mb="lg">
-        <Title order={1} style={{ flex: 1, textAlign: "center" }}>
-          MY PRODUCTS
-        </Title>
-        <Button component="a" href="/logout" color="red">
-          LOGOUT
-        </Button>
-      </Flex>
+    <>
+      <Navbar />
+      <Container size="md" py="xl">
+        <Flex justify="space-between" align="center" mb="lg">
+          <Title order={1} style={{ flex: 1, textAlign: "center" }}>
+            MY PRODUCTS
+          </Title>
+        </Flex>
 
-      {products.length === 0 ? (
-        <Text>No products found.</Text>
-      ) : (
-        products.map((product) => (
-          <Paper key={product.id} withBorder p="md" mb="md">
-            <Group position="apart" mb="xs">
-              <Title order={3}>{product.title}</Title>
-              <ActionIcon color="gray">
-                <IconTrash size={18} />
-              </ActionIcon>
-            </Group>
+        {products.length === 0 ? (
+          <Text>No products found.</Text>
+        ) : (
+          products.map((product) => (
+            <Paper key={product.id} withBorder p="md" mb="md">
+              <Group position="apart" mb="xs">
+                <Title order={3}>{product.title}</Title>
+                <ActionIcon color="gray">
+                  <IconTrash size={18} />
+                </ActionIcon>
+              </Group>
 
-            <Text size="sm" mb="xs">
-              Categories:{" "}
-              {Array.isArray(product.categories)
-                ? product.categories.join(", ")
-                : product.categories}
-            </Text>
-            <Text size="sm" mb="xs">
-              Price: ${product.price} | Rent: ${product.rent_price}{" "}
-              {product.rent_period}
-            </Text>
-            <Text mb="md">{product.description}</Text>
-
-            <Flex justify="space-between" align="center">
-              <Text size="xs" color="dimmed">
-                Date posted: {formatDate(product.createdAt)}
+              <Text size="sm" mb="xs">
+                Categories:{" "}
+                {Array.isArray(product.categories)
+                  ? product.categories.join(", ")
+                  : product.categories}
               </Text>
-              <Text size="xs" color="dimmed">
-                {product.views} views
+              <Text size="sm" mb="xs">
+                Price: ${product.price} | Rent: ${product.rent_price}{" "}
+                {product.rent_period}
               </Text>
-            </Flex>
+              <Text mb="md">{product.description}</Text>
 
-            {product.description && product.description.length > 100 && (
-              <Button variant="subtle" size="xs" mt="xs">
-                More Details
-              </Button>
-            )}
-          </Paper>
-        ))
-      )}
+              <Flex justify="space-between" align="center">
+                <Text size="xs" color="dimmed">
+                  Date posted: {formatDate(product.createdAt)}
+                </Text>
+                <Text size="xs" color="dimmed">
+                  {product.views} views
+                </Text>
+              </Flex>
 
-      <Group position="right" mt="xl">
-        <Button
-          onClick={() => {
-            router.push("/add-product");
-          }}
-        >
-          Add Product
-        </Button>
-      </Group>
-    </Container>
+              {product.description && product.description.length > 100 && (
+                <Button variant="subtle" size="xs" mt="xs">
+                  More Details
+                </Button>
+              )}
+            </Paper>
+          ))
+        )}
+
+        <Group position="right" mt="xl">
+          <Button
+            onClick={() => {
+              router.push("/add-product");
+            }}
+          >
+            Add Product
+          </Button>
+        </Group>
+      </Container>
+    </>
   );
 }

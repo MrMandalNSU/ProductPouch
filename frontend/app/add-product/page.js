@@ -1,5 +1,6 @@
 "use client";
 
+import Navbar from "@/components/Navbar";
 import React, { useState, useEffect } from "react";
 import {
   TextInput,
@@ -112,94 +113,98 @@ export default function CreateProductPage() {
   };
 
   return (
-    <Box maw={600} mx="auto" mt={20}>
-      <Stepper active={active} onStepClick={setActive}>
-        <Stepper.Step label="Title">
-          <TextInput
-            label="Product Title"
-            placeholder="Enter product title"
-            {...form.getInputProps("title")}
-          />
-        </Stepper.Step>
+    <>
+      <Navbar />
 
-        <Stepper.Step label="Categories">
-          <MultiSelect
-            label="Product Categories"
-            placeholder="Select categories"
-            data={[
-              { value: "Electronics", label: "Electronics" },
-              { value: "Toys", label: "Toys" },
-              { value: "Clothing", label: "Clothing" },
-              { value: "Books", label: "Books" },
-            ]}
-            {...form.getInputProps("categories")}
-          />
-        </Stepper.Step>
-
-        <Stepper.Step label="Description">
-          <Textarea
-            label="Product Description"
-            placeholder="Enter product description"
-            {...form.getInputProps("description")}
-          />
-        </Stepper.Step>
-
-        <Stepper.Step label="Pricing">
-          <NumberInput
-            label="Purchase Price"
-            placeholder="Enter purchase price"
-            prefix="$"
-            {...form.getInputProps("price")}
-          />
-          <Group grow>
-            <NumberInput
-              label="Rent Price"
-              placeholder="Enter rent price"
-              prefix="$"
-              {...form.getInputProps("rentPrice")}
+      <Box maw={600} mx="auto" mt={20}>
+        <Stepper active={active} onStepClick={setActive}>
+          <Stepper.Step label="Title">
+            <TextInput
+              label="Product Title"
+              placeholder="Enter product title"
+              {...form.getInputProps("title")}
             />
-            <Select
-              label="Rent Period"
-              placeholder="Select rent period"
+          </Stepper.Step>
+
+          <Stepper.Step label="Categories">
+            <MultiSelect
+              label="Product Categories"
+              placeholder="Select categories"
               data={[
-                { value: "daily", label: "Daily" },
-                { value: "weekly", label: "Weekly" },
-                { value: "monthly", label: "Monthly" },
-                { value: "yearly", label: "Yearly" },
+                { value: "Electronics", label: "Electronics" },
+                { value: "Toys", label: "Toys" },
+                { value: "Clothing", label: "Clothing" },
+                { value: "Books", label: "Books" },
               ]}
-              {...form.getInputProps("rentPeriod")}
+              {...form.getInputProps("categories")}
             />
-          </Group>
-        </Stepper.Step>
+          </Stepper.Step>
 
-        <Stepper.Step label="Summary">
-          <Text>Review your product details:</Text>
-          <Text>Title: {form.values.title}</Text>
-          <Text>
-            Categories:{" "}
-            {form.values.categories.length > 0
-              ? form.values.categories.join(", ")
-              : "No categories selected"}
-          </Text>
-          <Text>Description: {form.values.description}</Text>
-          <Text>Purchase Price: ${form.values.price}</Text>
-          <Text>
-            Rent Price: ${form.values.rentPrice} {form.values.rentPeriod}
-          </Text>
-        </Stepper.Step>
-      </Stepper>
+          <Stepper.Step label="Description">
+            <Textarea
+              label="Product Description"
+              placeholder="Enter product description"
+              {...form.getInputProps("description")}
+            />
+          </Stepper.Step>
 
-      <Group justify="center" mt="xl">
-        {active !== 0 && (
-          <Button variant="default" onClick={prevStep}>
-            Back
-          </Button>
-        )}
-        {active < 4 && <Button onClick={nextStep}>Next</Button>}
-        {active === 4 && (
-          <Button onClick={() => handleSubmit(form.values)}>Submit</Button>
-        )}
-      </Group>
-    </Box>
+          <Stepper.Step label="Pricing">
+            <NumberInput
+              label="Purchase Price"
+              placeholder="Enter purchase price"
+              prefix="$"
+              {...form.getInputProps("price")}
+            />
+            <Group grow>
+              <NumberInput
+                label="Rent Price"
+                placeholder="Enter rent price"
+                prefix="$"
+                {...form.getInputProps("rentPrice")}
+              />
+              <Select
+                label="Rent Period"
+                placeholder="Select rent period"
+                data={[
+                  { value: "daily", label: "Daily" },
+                  { value: "weekly", label: "Weekly" },
+                  { value: "monthly", label: "Monthly" },
+                  { value: "yearly", label: "Yearly" },
+                ]}
+                {...form.getInputProps("rentPeriod")}
+              />
+            </Group>
+          </Stepper.Step>
+
+          <Stepper.Step label="Summary">
+            <Text>Review your product details:</Text>
+            <Text>Title: {form.values.title}</Text>
+            <Text>
+              Categories:{" "}
+              {form.values.categories.length > 0
+                ? form.values.categories.join(", ")
+                : "No categories selected"}
+            </Text>
+            <Text>Description: {form.values.description}</Text>
+            <Text>Purchase Price: ${form.values.price}</Text>
+            <Text>
+              Rent Price: ${form.values.rentPrice} {form.values.rentPeriod}
+            </Text>
+          </Stepper.Step>
+        </Stepper>
+
+        <Group justify="center" mt="xl">
+          {active !== 0 && (
+            <Button variant="default" onClick={prevStep}>
+              Back
+            </Button>
+          )}
+          {active < 4 && <Button onClick={nextStep}>Next</Button>}
+          {active === 4 && (
+            <Button onClick={() => handleSubmit(form.values)}>Submit</Button>
+          )}
+        </Group>
+      </Box>
+    </>
   );
 }
