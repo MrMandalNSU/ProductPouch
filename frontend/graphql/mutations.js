@@ -28,3 +28,24 @@ export const LOGIN_USER = gql`
     }
   }
 `;
+
+export const GET_USER_PRODUCTS = gql`
+  query Products($userId: Int!) {
+    user(id: $userId) {
+      owner {
+        id
+        title
+        price
+        description
+        categories
+        rent_period
+        rent_price
+        status
+        views
+        owner_id
+        createdAt
+        updatedAt
+      }
+    }
+  }
+`;
