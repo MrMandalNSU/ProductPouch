@@ -1,8 +1,13 @@
 {
+  "name": "product_pouch",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
   "scripts": {
     "dev": "nodemon src/index.js"
   },
   "dependencies": {
+    "@apollo/server": "^4.11.3",
     "@prisma/client": "^6.4.1",
     "apollo-server-express": "^3.13.0",
     "bcryptjs": "^3.0.2",

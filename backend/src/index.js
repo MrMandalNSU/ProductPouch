@@ -1,35 +1,59 @@
+import { ApolloServer } from "@apollo/server";
+import { expressMiddleware } from "@apollo/server/express4";
 import express from "express";
-import { ApolloServer } from "apollo-server-express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { PrismaClient } from "@prisma/client";
-import typeDefs from "./graphql/typeDefs.js";
-import resolvers from "./graphql/resolvers.js";
+import { makeSchema } from "nexus";
+import path from "path";
 
+// Import GraphQL types and resolvers
+import { Query } from "./graphql/Query.js";
+import { Mutation } from "./graphql/Mutation.js";
+import { User } from "./graphql/types/User.js";
+import { Product } from "./graphql/types/Product.js";
+import { Rental } from "./graphql/types/Rental.js";
+
+// Load environment variables
 dotenv.config();
-const app = express();
+
+// Initialize Prisma
 const prisma = new PrismaClient();
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+// Setup Express App
+const app = express();
 
-// Apollo Server
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-  context: () => ({ prisma }),
+// Enable CORS for frontend
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
+
+// Create Nexus Schema
+const schema = makeSchema({
+  types: [Query, Mutation, User, Product, Rental],
+  outputs: {
+    schema: path.join(process.cwd(), "generated/schema.graphql"),
+    typegen: path.join(process.cwd(), "generated/nexus-types.d.ts"),
+  },
 });
 
-async function startServer() {
-  await server.start();
-  server.applyMiddleware({ app });
+// Initialize Apollo Server
+const server = new ApolloServer({
+  schema,
+  context: ({ req }) => ({ prisma, req }),
+});
 
-  app.listen(4000, () => {
-    console.log(
-      `🚀 Server running at http://localhost:4000${server.graphqlPath}`
-    );
-  });
-}
+// Start Apollo Server
+await server.start();
 
-startServer();
+// Apply middleware to Express
+app.use("/graphql", express.json(), expressMiddleware(server));
+
+// Start the server
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server ready at http://localhost:${PORT}/graphql`);
+});
