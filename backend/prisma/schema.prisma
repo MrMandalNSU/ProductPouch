@@ -19,8 +19,9 @@ model User {
   updatedAt  DateTime @default(now())
 
   //relations
-  owner Product[] @relation("owner")
-  buyer Product[] @relation("buyer")
+  owner  Product[] @relation("owner")
+  buyer  Product[] @relation("buyer")
+  rental Rental[]  @relation("renter")
 }
 
 model Product {
@@ -37,8 +38,21 @@ model Product {
   updatedAt   DateTime @default(now())
 
   //relations
-  owner    User  @relation("owner", fields: [owner_id], references: [id])
+  owner    User     @relation("owner", fields: [owner_id], references: [id])
   owner_id Int
-  buyer    User? @relation("buyer", fields: [buyer_id], references: [id])
+  buyer    User?    @relation("buyer", fields: [buyer_id], references: [id])
   buyer_id Int?
+  rental   Rental[] @relation("rental")
+}
+
+model Rental {
+  id        Int    @id @default(autoincrement())
+  rent_from String
+  rent_to   String
+
+  //relations
+  product    Product @relation("rental", fields: [product_id], references: [id])
+  product_id Int
+  renter     User    @relation("renter", fields: [renter_id], references: [id])
+  renter_id  Int
 }
