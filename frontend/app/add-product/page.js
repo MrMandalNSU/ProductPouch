@@ -132,9 +132,11 @@ export default function CreateProductPage() {
               placeholder="Select categories"
               data={[
                 { value: "Electronics", label: "Electronics" },
+                { value: "Furniture", label: "Furniture" },
+                { value: "Home Appliances", label: "Home Appliances" },
+                { value: "Sporting Goods", label: "Sporting Goods" },
+                { value: "Outdoor", label: "Outdoor" },
                 { value: "Toys", label: "Toys" },
-                { value: "Clothing", label: "Clothing" },
-                { value: "Books", label: "Books" },
               ]}
               {...form.getInputProps("categories")}
             />
