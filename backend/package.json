@@ -2,9 +2,9 @@
   "name": "product_pouch",
   "version": "1.0.0",
   "main": "index.js",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon index.js"
   },
   "dependencies": {
     "@apollo/server": "^4.11.3",
