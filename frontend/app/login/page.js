@@ -18,21 +18,22 @@ import Link from "next/link";
 import { useMutation } from "@apollo/client";
 import { LOGIN_USER } from "../../graphql/mutations";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../../context/auth-context";
 
 export default function Login() {
   const router = useRouter();
+  const { login: authLogin } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   // Apollo login mutation
-  const [login, { loading }] = useMutation(LOGIN_USER, {
+  const [loginMutation, { loading }] = useMutation(LOGIN_USER, {
     onCompleted: (data) => {
       console.log("Login successful:", data);
 
-      // Using local storage to save user token
-      localStorage.setItem("token", data.login.token);
-      localStorage.setItem("user", JSON.stringify(data.login.user));
+      // Use the auth context to login
+      authLogin(data.login.user, data.login.token);
 
       router.push("/");
     },
@@ -47,7 +48,7 @@ export default function Login() {
     setError("");
 
     // Triggers login mutation
-    login({
+    loginMutation({
       variables: {
         email,
         password,
