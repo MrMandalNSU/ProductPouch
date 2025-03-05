@@ -10,6 +10,7 @@ import {
   ActionIcon,
   Flex,
   Paper,
+  Modal,
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
 import { useQuery, useMutation } from "@apollo/client";
@@ -20,6 +21,7 @@ import Navbar from "@/components/Navbar";
 export default function ProductsPage() {
   const router = useRouter();
   const [userId, setUserId] = useState(null);
+  const [productToDelete, setProductToDelete] = useState(null);
 
   // Move useEffect before the query hook
   useEffect(() => {
@@ -54,7 +56,7 @@ export default function ProductsPage() {
   // Execute the GraphQL query
   const { loading, error, data, refetch } = useQuery(GET_USER_PRODUCTS, {
     variables: { userId },
-    skip: !userId, // Skip the query until userId is available
+    skip: !userId,
   });
 
   // Handle product click
@@ -74,11 +76,19 @@ export default function ProductsPage() {
 
   // Handle delete action
   const handleActionClick = (product) => {
-    deleteProduct({
-      variables: {
-        deleteProductId: product.id,
-      },
-    });
+    setProductToDelete(product);
+  };
+
+  // Confirm delete
+  const confirmDelete = () => {
+    if (productToDelete) {
+      deleteProduct({
+        variables: {
+          deleteProductId: productToDelete.id,
+        },
+      });
+      setProductToDelete(null);
+    }
   };
 
   // Formatting function
@@ -211,6 +221,26 @@ export default function ProductsPage() {
           </Button>
         </Group>
       </Container>
+
+      <Modal
+        opened={!!productToDelete}
+        onClose={() => setProductToDelete(null)}
+        centered
+        withCloseButton={false}
+        size="xs"
+      >
+        <Text ta="center" mb="md">
+          Are you sure you want to delete this product?
+        </Text>
+        <Group justify="center">
+          <Button color="red" onClick={() => setProductToDelete(null)}>
+            No
+          </Button>
+          <Button color="violet" onClick={confirmDelete}>
+            Yes
+          </Button>
+        </Group>
+      </Modal>
     </>
   );
 }
