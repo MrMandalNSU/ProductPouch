@@ -1,4 +1,4 @@
-# ProductPouch
+# ProductPouch aka Teebay
 
 A simple interactive application featuring product buy, sell and rental functionalities
 
@@ -26,3 +26,7 @@ A simple interactive application featuring product buy, sell and rental function
 - Mantine UI from, stepper, tabs
 - apollo client, GraphQL schema, Gql APIs integration
 - prisma ORM, postgres
+
+## Project Demo
+
+- google drive link: `https://drive.google.com/drive/folders/1GLIY44sLaBanWwAKY8MRcXyIaQ3E1Jl5?usp=sharing`
