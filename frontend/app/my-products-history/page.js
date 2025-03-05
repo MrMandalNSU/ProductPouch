@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Container,
   Tabs,
@@ -11,45 +11,117 @@ import {
   Title,
 } from "@mantine/core";
 import Navbar from "@/components/Navbar";
+import { useRouter } from "next/navigation";
+import { useQuery } from "@apollo/client";
+import { GET_ALL_PRODUCTS, BOUGHT_PRODUCTS } from "../../graphql/mutations";
 
 export default function ProductHistoryPage() {
-  // Placeholder data - replace with actual GraphQL query
   const [activeTab, setActiveTab] = useState("bought");
+  const [userId, setUserId] = useState(null);
+  const router = useRouter();
 
-  const mockHistoryData = {
-    bought: [
-      {
-        id: "1",
-        title: "iPhone 13 pro max",
-        categories: ["Electronics"],
-        price: 1500,
-        date: "15 Mar 2025",
-        status: "bought",
-        additionalInfo: "Latest iPhone 13 max. Bought from the Apple store.",
-      },
-    ],
-    sold: [],
-    borrowed: [],
-    lent: [],
+  useEffect(() => {
+    // Get the token and user info from localStorage
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    setUserId(user.id || null);
+  }, []);
+
+  // Execute the GraphQL query
+  const { loading, error, data, refetch } = useQuery(GET_ALL_PRODUCTS);
+
+  const products = data?.products || [];
+
+  const historyDataFunction = (products) => {
+    const result = {
+      bought: [],
+      sold: [],
+      borrowed: [],
+      lent: [],
+    };
+
+    products.forEach((element) => {
+      // Bought Items
+      if (userId === Number(element?.buyer_id)) {
+        result.bought.push(element);
+      }
+
+      // Sold Items
+      if (userId === Number(element?.owner_id) && element?.status === "sold") {
+        result.sold.push(element);
+      }
+
+      // Borrowed Items
+      if (
+        element?.rental &&
+        element.rental.some((rental) => userId === Number(rental?.renter_id))
+      ) {
+        result.borrowed.push(element);
+      }
+
+      // Lent Items
+      if (
+        userId === Number(element?.owner_id) &&
+        element?.status === "rented"
+      ) {
+        result.lent.push(element);
+      }
+    });
+
+    return result;
+  };
+
+  // Generating history data form tabs
+  const historyData = historyDataFunction(products);
+
+  // Date Formatting function
+  const formatDate = (dateString) => {
+    const timestamp = Number(dateString);
+    const date = new Date(timestamp);
+
+    if (isNaN(date.getTime())) {
+      return "Invalid Date";
+    }
+
+    const day = date.getDate();
+    const month = date.getMonth();
+    const year = date.getFullYear();
+
+    const getOrdinalSuffix = (day) => {
+      if (day > 3 && day < 21) return "th";
+      switch (day % 10) {
+        case 1:
+          return "st";
+        case 2:
+          return "nd";
+        case 3:
+          return "rd";
+        default:
+          return "th";
+      }
+    };
+
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    return `${day}${getOrdinalSuffix(day)} ${months[month]} ${year}`;
   };
 
   const renderProductHistoryItem = (item) => (
     <Paper key={item.id} withBorder p="md" mb="md">
       <Flex justify="space-between" align="center" mb="xs">
         <Title order={3}>{item.title}</Title>
-        <Badge
-          color={
-            item.status === "bought"
-              ? "green"
-              : item.status === "sold"
-              ? "blue"
-              : item.status === "borrowed"
-              ? "orange"
-              : "purple"
-          }
-        >
-          {item.status.toUpperCase()}
-        </Badge>
       </Flex>
 
       <Text size="sm" mb="xs">
@@ -60,14 +132,15 @@ export default function ProductHistoryPage() {
       </Text>
 
       <Text size="sm" mb="xs">
-        Price: ${item.price}
+        Price: ${item.price} | Rent Price: ${item.rent_price} | Rent Period: $
+        {item.rent_period}
       </Text>
 
-      {item.additionalInfo && <Text mb="md">{item.additionalInfo}</Text>}
+      {item.description && <Text mb="md">{item.description}</Text>}
 
       <Flex justify="space-between" align="center">
         <Text size="xs" color="dimmed">
-          Date: {item.date}
+          Date: {formatDate(item.createdAt)}
         </Text>
       </Flex>
     </Paper>
@@ -90,42 +163,42 @@ export default function ProductHistoryPage() {
           </Tabs.List>
 
           <Tabs.Panel value="bought" pt="xs">
-            {mockHistoryData.bought.length === 0 ? (
+            {historyData?.bought?.length === 0 ? (
               <Text style={{ textAlign: "center", color: "dimmed" }} py="md">
                 No bought items
               </Text>
             ) : (
-              mockHistoryData.bought.map(renderProductHistoryItem)
+              historyData?.bought?.map(renderProductHistoryItem)
             )}
           </Tabs.Panel>
 
           <Tabs.Panel value="sold" pt="xs">
-            {mockHistoryData.sold.length === 0 ? (
+            {historyData?.sold?.length === 0 ? (
               <Text style={{ textAlign: "center", color: "dimmed" }} py="md">
                 No sold items
               </Text>
             ) : (
-              mockHistoryData.sold.map(renderProductHistoryItem)
+              historyData?.sold?.map(renderProductHistoryItem)
             )}
           </Tabs.Panel>
 
           <Tabs.Panel value="borrowed" pt="xs">
-            {mockHistoryData.borrowed.length === 0 ? (
+            {historyData?.borrowed?.length === 0 ? (
               <Text style={{ textAlign: "center", color: "dimmed" }} py="md">
                 No borrowed items
               </Text>
             ) : (
-              mockHistoryData.borrowed.map(renderProductHistoryItem)
+              historyData?.borrowed?.map(renderProductHistoryItem)
             )}
           </Tabs.Panel>
 
           <Tabs.Panel value="lent" pt="xs">
-            {mockHistoryData.lent.length === 0 ? (
+            {historyData?.lent?.length === 0 ? (
               <Text style={{ textAlign: "center", color: "dimmed" }} py="md">
                 No lent items
               </Text>
             ) : (
-              mockHistoryData.lent.map(renderProductHistoryItem)
+              historyData?.lent?.map(renderProductHistoryItem)
             )}
           </Tabs.Panel>
         </Tabs>

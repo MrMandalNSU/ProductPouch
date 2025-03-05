@@ -118,6 +118,7 @@ export const GET_ALL_PRODUCTS = gql`
       status
       views
       owner_id
+      buyer_id
       updatedAt
       createdAt
       owner {
@@ -134,6 +135,26 @@ export const GET_ALL_PRODUCTS = gql`
         rent_from
         rent_to
         renter_id
+      }
+    }
+  }
+`;
+
+export const BOUGHT_PRODUCTS = gql`
+  query BoughtProducts($userId: Int!) {
+    user(id: $userId) {
+      buyer {
+        title
+        status
+        description
+        categories
+        rent_price
+        rent_period
+        price
+        id
+        views
+        createdAt
+        updatedAt
       }
     }
   }
