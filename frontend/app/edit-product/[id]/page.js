@@ -40,7 +40,7 @@ export default function EditProductPage() {
   const [updateProduct, { loading }] = useMutation(UPDATE_PRODUCT, {
     onCompleted: (data) => {
       console.log("Product Updated: ", data);
-      router.push("/my-products");
+      window.location.href = "/my-products";
     },
     onError: (error) => {
       console.log("data", data);

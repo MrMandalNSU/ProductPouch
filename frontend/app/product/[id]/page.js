@@ -32,6 +32,7 @@ export default function SingleProductPage() {
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     // Get the token and user info from localStorage
@@ -50,6 +51,7 @@ export default function SingleProductPage() {
     categories: searchParams.get("categories"),
     owner_id: Number(searchParams.get("owner_id")),
     rental: JSON.parse(decodeURIComponent(searchParams.get("rental"))),
+    views: Number(searchParams.get("views")) + 1,
   };
 
   if (!product) return <Text>Loading product details...</Text>;
@@ -80,6 +82,7 @@ export default function SingleProductPage() {
         input: {
           buyer_id: userId,
           status: "sold",
+          views: product.views,
         },
       },
     });
@@ -101,7 +104,10 @@ export default function SingleProductPage() {
       await updateProduct({
         variables: {
           updateProductId: product.id,
-          input: { status: "rented" },
+          input: {
+            status: "rented",
+            views: product.views,
+          },
         },
       });
 

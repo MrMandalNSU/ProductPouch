@@ -90,6 +90,7 @@ export const BUY_PRODUCT = gql`
     updateProduct(id: $updateProductId, input: $input) {
       buyer_id
       status
+      views
     }
   }
 `;
