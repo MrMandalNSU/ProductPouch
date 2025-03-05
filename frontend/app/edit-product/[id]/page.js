@@ -123,20 +123,19 @@ export default function EditProductPage() {
               min={0}
               {...form.getInputProps("price")}
             />
-            <Group>
-              <NumberInput
-                label="Rent"
-                placeholder="Rent price"
-                prefix="$"
-                min={0}
-                {...form.getInputProps("rent")}
-              />
-              <Select
-                label="Per"
-                data={["per hr", "per day", "per week", "per month"]}
-                {...form.getInputProps("rentPeriod")}
-              />
-            </Group>
+
+            <NumberInput
+              label="Rent"
+              placeholder="Rent price"
+              prefix="$"
+              min={0}
+              {...form.getInputProps("rent")}
+            />
+            <Select
+              label="Rent Period"
+              data={["daily", "weekly", "monthly", "yearly"]}
+              {...form.getInputProps("rentPeriod")}
+            />
           </Group>
 
           <Button type="submit" fullWidth color="violet" loading={loading}>
