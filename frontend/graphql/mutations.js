@@ -64,6 +64,19 @@ export const CREATE_PRODUCT = gql`
   }
 `;
 
+export const UPDATE_PRODUCT = gql`
+  mutation Mutation($updateProductId: Int!, $input: UpdateProductInput!) {
+    updateProduct(id: $updateProductId, input: $input) {
+      title
+      description
+      categories
+      price
+      rent_price
+      rent_period
+    }
+  }
+`;
+
 export const GET_ALL_PRODUCTS = gql`
   query Products {
     products {

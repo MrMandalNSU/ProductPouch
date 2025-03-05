@@ -16,8 +16,7 @@ import { useForm } from "@mantine/form";
 import Navbar from "@/components/Navbar";
 import { useRouter, useSearchParams, useParams } from "next/navigation";
 import { useMutation } from "@apollo/client";
-// Import your actual GraphQL mutation when ready
-// import { UPDATE_PRODUCT } from "../../graphql/mutations";
+import { UPDATE_PRODUCT } from "../../../graphql/mutations";
 
 export default function EditProductPage() {
   const searchParams = useSearchParams();
@@ -37,9 +36,17 @@ export default function EditProductPage() {
     description: searchParams.get("description") || "",
   };
 
-  // Placeholder for GraphQL mutation
-  const [updateProduct, { loading }] = useState({
-    loading: false,
+  // Apollo mutation hook
+  const [updateProduct, { loading }] = useMutation(UPDATE_PRODUCT, {
+    onCompleted: (data) => {
+      console.log("Product Updated: ", data);
+      router.push("/my-products");
+    },
+    onError: (error) => {
+      console.log("data", data);
+      console.error("Error creating user:", error);
+      setError(error.message);
+    },
   });
 
   // Initialize form with values from route parameters
@@ -67,13 +74,25 @@ export default function EditProductPage() {
     console.log("Product update values:", values);
     console.log("Product ID:", product.id);
 
-    // Uncomment and modify when actual mutation is ready
-    // updateProduct({
-    //   variables: {
-    //     productId: product.id,
-    //     updateData: values
-    //   }
-    // });
+    // GraphQL input structure
+    const userInput = {
+      title: values.title,
+      description: values.description,
+      categories: values.categories,
+      price: Number(values.price),
+      rent_price: Number(values.rent),
+      rent_period: values.rentPeriod,
+    };
+
+    console.log("user input: ", userInput);
+
+    // Trigger mutation
+    updateProduct({
+      variables: {
+        updateProductId: Number(product.id),
+        input: userInput,
+      },
+    });
   };
 
   return (
