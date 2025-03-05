@@ -12,7 +12,11 @@ const resolvers = {
       });
     },
     products: async () => {
-      return prisma.product.findMany();
+      return prisma.product.findMany({
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
     },
     product: async (_, { id }) => {
       return prisma.product.findUnique({
