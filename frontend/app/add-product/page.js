@@ -80,7 +80,7 @@ export default function CreateProductPage() {
   const [createProduct, { loading }] = useMutation(CREATE_PRODUCT, {
     onCompleted: (data) => {
       console.log("Product Created: ", data);
-      router.push("/my-products");
+      window.location.href = "/my-products";
     },
     onError: (error) => {
       console.error("Error creating user:", error);
