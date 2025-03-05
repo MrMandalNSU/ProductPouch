@@ -133,11 +133,7 @@ export const GET_ALL_PRODUCTS = gql`
       rental {
         rent_from
         rent_to
-        renter {
-          first_name
-          email
-          phone
-        }
+        renter_id
       }
     }
   }

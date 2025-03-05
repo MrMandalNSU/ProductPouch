@@ -1,7 +1,7 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import {
   Container,
@@ -49,6 +49,7 @@ export default function SingleProductPage() {
     description: searchParams.get("description"),
     categories: searchParams.get("categories"),
     owner_id: Number(searchParams.get("owner_id")),
+    rental: JSON.parse(decodeURIComponent(searchParams.get("rental"))),
   };
 
   if (!product) return <Text>Loading product details...</Text>;
@@ -166,7 +167,9 @@ export default function SingleProductPage() {
               <Button
                 color="blue"
                 onClick={() => setBuyModalOpen(true)}
-                disabled={userId === product.owner_id}
+                disabled={
+                  userId === product.owner_id || product.status === "sold"
+                }
               >
                 Buy
               </Button>
@@ -179,7 +182,9 @@ export default function SingleProductPage() {
               <Button
                 color="orange"
                 onClick={() => setRentModalOpen(true)}
-                disabled={userId === product.owner_id}
+                disabled={
+                  userId === product.owner_id || product.status === "sold"
+                }
               >
                 Rent
               </Button>

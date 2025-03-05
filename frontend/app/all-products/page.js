@@ -94,6 +94,7 @@ export default function ProductsPage() {
       description: product.description,
       categories: product.categories,
       owner_id: product.owner_id,
+      rental: encodeURIComponent(JSON.stringify(product.rental)),
     }).toString();
 
     router.push(`/product/${product.id}?${queryString}`);
