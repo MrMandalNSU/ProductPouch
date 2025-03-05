@@ -16,7 +16,11 @@ import {
 } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { useMutation } from "@apollo/client";
-import { BUY_PRODUCT } from "../../../graphql/mutations";
+import {
+  BUY_PRODUCT,
+  UPDATE_PRODUCT,
+  CREATE_RENTAL,
+} from "../../../graphql/mutations";
 
 export default function SingleProductPage() {
   const { id } = useParams();
@@ -49,17 +53,20 @@ export default function SingleProductPage() {
 
   if (!product) return <Text>Loading product details...</Text>;
 
-  // Apollo mutation hook
+  // Apollo mutation hooks
   const [buyProduct, { loading }] = useMutation(BUY_PRODUCT, {
     onCompleted: (data) => {
       console.log("Product bought: ", data);
-      router.push("/all-products");
+      window.location.href = "/all-products";
     },
     onError: (error) => {
       console.error("Error creating user:", error);
       setError(error.message || "An error occurred during buy");
     },
   });
+
+  const [updateProduct] = useMutation(UPDATE_PRODUCT);
+  const [createRental] = useMutation(CREATE_RENTAL);
 
   const handleBuy = () => {
     setBuyModalOpen(false);
@@ -77,7 +84,7 @@ export default function SingleProductPage() {
     });
   };
 
-  const handleRent = () => {
+  const handleRent = async () => {
     if (!fromDate || !toDate) {
       alert("Please select rental dates");
       return;
@@ -88,6 +95,32 @@ export default function SingleProductPage() {
         product.title
       } from ${fromDate.toLocaleDateString()} to ${toDate.toLocaleDateString()}!`
     );
+
+    try {
+      await updateProduct({
+        variables: {
+          updateProductId: product.id,
+          input: { status: "rented" },
+        },
+      });
+
+      await createRental({
+        variables: {
+          input: {
+            rent_from: fromDate,
+            rent_to: toDate,
+            product_id: product.id,
+            renter_id: userId,
+          },
+        },
+      });
+
+      // Redirect after successful rental
+      window.location.href = "/all-products";
+    } catch (error) {
+      console.error("Error renting product:", error);
+      setError(error.message || "An error occurred during rent");
+    }
   };
 
   return (

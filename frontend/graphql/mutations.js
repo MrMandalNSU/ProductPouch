@@ -94,6 +94,17 @@ export const BUY_PRODUCT = gql`
   }
 `;
 
+export const CREATE_RENTAL = gql`
+  mutation CreateRental($input: CreateRentalInput!) {
+    createRental(input: $input) {
+      product_id
+      rent_from
+      rent_to
+      renter_id
+    }
+  }
+`;
+
 export const GET_ALL_PRODUCTS = gql`
   query Products {
     products {
