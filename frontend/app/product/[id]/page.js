@@ -1,7 +1,7 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import {
   Container,
@@ -11,9 +11,9 @@ import {
   Button,
   Modal,
   Group,
-  DatePickerInput,
+  Stack,
 } from "@mantine/core";
-import { DatePicker } from "@mantine/dates";
+import { DatePickerInput } from "@mantine/dates";
 
 export default function SingleProductPage() {
   const { id } = useParams();
@@ -97,12 +97,13 @@ export default function SingleProductPage() {
           opened={buyModalOpen}
           onClose={() => setBuyModalOpen(false)}
           title="Confirm Purchase"
+          centered
         >
           <Text>
             Are you sure you want to buy <strong>{product.title}</strong> for $
             {product.price}?
           </Text>
-          <Group position="right" mt="md">
+          <Group justify="center" mt="md">
             <Button variant="default" onClick={() => setBuyModalOpen(false)}>
               Cancel
             </Button>
@@ -117,21 +118,29 @@ export default function SingleProductPage() {
           opened={rentModalOpen}
           onClose={() => setRentModalOpen(false)}
           title="Rent Product"
+          centered
         >
-          <DatePicker
-            label="From"
-            value={fromDate}
-            onChange={setFromDate}
-            placeholder="Pick a start date"
-          />
-          <DatePicker
-            label="To"
-            value={toDate}
-            onChange={setToDate}
-            placeholder="Pick an end date"
-            mt="sm"
-          />
-          <Group position="right" mt="md">
+          <Stack spacing="sm" align="center">
+            <Group position="center" mt="md">
+              <DatePickerInput
+                label="From"
+                value={fromDate}
+                onChange={setFromDate}
+                placeholder="Pick a start date"
+                valueFormat="DD/MM/YYYY"
+                clearable
+              />
+              <DatePickerInput
+                label="To"
+                value={toDate}
+                onChange={setToDate}
+                placeholder="Pick an end date"
+                valueFormat="DD/MM/YYYY"
+                clearable
+              />
+            </Group>
+          </Stack>
+          <Group justify="center" mt="lg">
             <Button variant="default" onClick={() => setRentModalOpen(false)}>
               Cancel
             </Button>
