@@ -93,6 +93,7 @@ export default function ProductsPage() {
       status: product.status,
       description: product.description,
       categories: product.categories,
+      owner_id: product.owner_id,
     }).toString();
 
     router.push(`/product/${product.id}?${queryString}`);

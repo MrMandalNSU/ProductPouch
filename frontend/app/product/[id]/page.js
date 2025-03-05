@@ -1,7 +1,7 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import {
   Container,
@@ -12,6 +12,7 @@ import {
   Modal,
   Group,
   Stack,
+  Tooltip,
 } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 
@@ -23,6 +24,13 @@ export default function SingleProductPage() {
   const [rentModalOpen, setRentModalOpen] = useState(false);
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    // Get the token and user info from localStorage
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    setUserId(user.id || null);
+  }, []);
 
   const product = {
     title: searchParams.get("title"),
@@ -32,6 +40,7 @@ export default function SingleProductPage() {
     status: searchParams.get("status"),
     description: searchParams.get("description"),
     categories: searchParams.get("categories"),
+    owner_id: Number(searchParams.get("owner_id")),
   };
 
   if (!product) return <Text>Loading product details...</Text>;
@@ -90,12 +99,31 @@ export default function SingleProductPage() {
 
           {/* Action Buttons */}
           <Group position="right" mt="xl">
-            <Button color="blue" onClick={() => setBuyModalOpen(true)}>
-              Buy
-            </Button>
-            <Button color="orange" onClick={() => setRentModalOpen(true)}>
-              Rent
-            </Button>
+            <Tooltip
+              label="You cannot buy your own product"
+              disabled={userId !== product.owner_id}
+            >
+              <Button
+                color="blue"
+                onClick={() => setBuyModalOpen(true)}
+                disabled={userId === product.owner_id}
+              >
+                Buy
+              </Button>
+            </Tooltip>
+
+            <Tooltip
+              label="You cannot rent your own product"
+              disabled={userId !== product.owner_id}
+            >
+              <Button
+                color="orange"
+                onClick={() => setRentModalOpen(true)}
+                disabled={userId === product.owner_id}
+              >
+                Rent
+              </Button>
+            </Tooltip>
           </Group>
         </Paper>
 
