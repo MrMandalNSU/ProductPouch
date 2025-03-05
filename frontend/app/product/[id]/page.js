@@ -245,6 +245,7 @@ export default function SingleProductPage() {
                 clearable
                 // Disable dates that are already rented
                 excludeDate={shouldDisableDate}
+                minDate={new Date()}
               />
               <DatePickerInput
                 label="To"
@@ -255,6 +256,7 @@ export default function SingleProductPage() {
                 clearable
                 // Disable dates that are already rented
                 excludeDate={shouldDisableDate}
+                minDate={fromDate || new Date()}
               />
             </Group>
           </Stack>
