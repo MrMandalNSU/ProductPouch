@@ -3,6 +3,8 @@ import "./globals.css";
 import "@mantine/core/styles.css";
 import MantineWrapper from "./MantineWrapper";
 import { Providers } from "./providers";
+import "@mantine/core/styles.css";
+import "@mantine/dates/styles.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

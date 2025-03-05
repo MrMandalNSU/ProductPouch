@@ -63,3 +63,54 @@ export const CREATE_PRODUCT = gql`
     }
   }
 `;
+
+export const UPDATE_PRODUCT = gql`
+  mutation Mutation($updateProductId: Int!, $input: UpdateProductInput!) {
+    updateProduct(id: $updateProductId, input: $input) {
+      title
+      description
+      categories
+      price
+      rent_price
+      rent_period
+    }
+  }
+`;
+
+export const GET_ALL_PRODUCTS = gql`
+  query Products {
+    products {
+      id
+      title
+      categories
+      description
+      price
+      rent_period
+      rent_price
+      status
+      views
+      owner_id
+      updatedAt
+      createdAt
+      owner {
+        first_name
+        email
+        phone
+      }
+      buyer {
+        first_name
+        email
+        phone
+      }
+      rental {
+        rent_from
+        rent_to
+        renter {
+          first_name
+          email
+          phone
+        }
+      }
+    }
+  }
+`;
