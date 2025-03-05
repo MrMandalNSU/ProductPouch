@@ -211,7 +211,7 @@ export default function ProductsPage() {
           ))
         )}
 
-        <Group position="right" mt="xl">
+        <Group justify="flex-end" mt="xl">
           <Button
             onClick={() => {
               router.push("/add-product");
