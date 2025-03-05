@@ -1,21 +1,28 @@
 # ProductPouch
 
-A simple application featuring product buy, sell and rental functionalities
+A simple interactive application featuring product buy, sell and rental functionalities
 
-## List of checkpoints ✔️
+## Tech Stack Used
 
-- Backend setup with postgres, prisma, apollo, gql
-- prisma schema, gql schema, resolver
-- Frontend setup with next, react, mantine UI
-- Login/sign-up page
-- Integrate login & sign-up page with apollo gql
-- Navigation bar with logout
-- Create my product page
-- Create product creation page with mantine form
+- Frontend: React, Next Js, Mantine UI, Apollo Client, GraphQL query & mutations APIs
+- Backend: Node js, Apollo Express, GraphQL, Prisma, Postgres
+- APIs: GraphQL queries nad mutations
 
-## To-DO 👉
+## Project Set-up guide
 
-- Create all product page
-- Product edit page
-- Integrate product functionalities buy/sell/rent
-- Integrate product CRUD functionalities
+- go to `cd frontend/` run `npm install` it will install all the frontend dependencies
+- go to `cd backend/` run `npm install` it will install all the backend dependencies
+- install postgres on local machine
+- create a `.env` file and put database path name and password `DATABASE_URL="postgresql://postgres:password@localhost:5432/mydb?schema=public"`
+- run migration on prisma to generate model and relations with the prisma schema `npx prisma migrate dev --name update_user_with_timestamps`
+- generate schema by `npx prisma generate`
+- for GUI database interface use `npx prisma studio`
+- run frontend from frontend directory by `npm run dev` client will start on port 3000
+- run backend from backend directory by `npm run dev` server will start on port 4000 and apollo studio will be accessible for GraphQL exploration
+
+## Highlighted topics
+
+- next js static/dynamic routing
+- Mantine UI from, stepper, tabs
+- apollo client, GraphQL schema, Gql APIs integration
+- prisma ORM, postgres
