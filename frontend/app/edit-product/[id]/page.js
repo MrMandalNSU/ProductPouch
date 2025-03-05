@@ -14,24 +14,26 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import Navbar from "@/components/Navbar";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, useParams } from "next/navigation";
 import { useMutation } from "@apollo/client";
 // Import your actual GraphQL mutation when ready
 // import { UPDATE_PRODUCT } from "../../graphql/mutations";
 
 export default function EditProductPage() {
   const searchParams = useSearchParams();
+  const params = useParams();
   const router = useRouter();
 
   // Extract product details from route parameters
   const product = {
+    id: params.id, // Get product ID from route params
     title: searchParams.get("title") || "",
     price: searchParams.get("price") ? Number(searchParams.get("price")) : 0,
     rent_price: searchParams.get("rent_price")
       ? Number(searchParams.get("rent_price"))
       : 0,
     rent_period: searchParams.get("rent_period") || "per hr",
-    status: searchParams.get("status") || "",
+    categories: searchParams.get("categories")?.split(",") || [],
     description: searchParams.get("description") || "",
   };
 
@@ -44,15 +46,17 @@ export default function EditProductPage() {
   const form = useForm({
     initialValues: {
       title: product.title,
+      categories: product.categories,
       description: product.description,
       price: product.price,
       rent: product.rent_price,
       rentPeriod: product.rent_period,
-      categories: product.categories,
     },
     validate: {
       title: (value) =>
         value.trim().length === 0 ? "Title is required" : null,
+      categories: (value) =>
+        value.length === 0 ? "Select at least one category" : null,
       price: (value) => (value <= 0 ? "Price must be positive" : null),
       rent: (value) => (value < 0 ? "Rent cannot be negative" : null),
     },
@@ -61,11 +65,12 @@ export default function EditProductPage() {
   const handleSubmit = (values) => {
     // Placeholder for actual update mutation
     console.log("Product update values:", values);
+    console.log("Product ID:", product.id);
 
     // Uncomment and modify when actual mutation is ready
     // updateProduct({
     //   variables: {
-    //     productId: productId, // You'll need to pass the product ID
+    //     productId: product.id,
     //     updateData: values
     //   }
     // });
@@ -89,7 +94,7 @@ export default function EditProductPage() {
 
           <MultiSelect
             label="Categories"
-            placeholder="Select category"
+            placeholder="Select categories"
             data={[
               { value: "Electronics", label: "Electronics" },
               { value: "Furniture", label: "Furniture" },
