@@ -85,6 +85,15 @@ export const DELETE_PRODUCT = gql`
   }
 `;
 
+export const BUY_PRODUCT = gql`
+  mutation UpdateProduct($updateProductId: Int!, $input: UpdateProductInput!) {
+    updateProduct(id: $updateProductId, input: $input) {
+      buyer_id
+      status
+    }
+  }
+`;
+
 export const GET_ALL_PRODUCTS = gql`
   query Products {
     products {

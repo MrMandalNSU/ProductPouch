@@ -15,10 +15,13 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
+import { useMutation } from "@apollo/client";
+import { BUY_PRODUCT } from "../../../graphql/mutations";
 
 export default function SingleProductPage() {
   const { id } = useParams();
   const router = useRouter();
+  const params = useParams();
   const searchParams = useSearchParams();
   const [buyModalOpen, setBuyModalOpen] = useState(false);
   const [rentModalOpen, setRentModalOpen] = useState(false);
@@ -33,6 +36,7 @@ export default function SingleProductPage() {
   }, []);
 
   const product = {
+    id: Number(params.id),
     title: searchParams.get("title"),
     price: searchParams.get("price"),
     rent_price: searchParams.get("rent_price"),
@@ -45,9 +49,32 @@ export default function SingleProductPage() {
 
   if (!product) return <Text>Loading product details...</Text>;
 
+  // Apollo mutation hook
+  const [buyProduct, { loading }] = useMutation(BUY_PRODUCT, {
+    onCompleted: (data) => {
+      console.log("Product bought: ", data);
+      router.push("/all-products");
+    },
+    onError: (error) => {
+      console.error("Error creating user:", error);
+      setError(error.message || "An error occurred during buy");
+    },
+  });
+
   const handleBuy = () => {
     setBuyModalOpen(false);
     alert(`You have bought ${product.title} for $${product.price}!`);
+
+    // Trigger mutation
+    buyProduct({
+      variables: {
+        updateProductId: product.id,
+        input: {
+          buyer_id: userId,
+          status: "sold",
+        },
+      },
+    });
   };
 
   const handleRent = () => {
