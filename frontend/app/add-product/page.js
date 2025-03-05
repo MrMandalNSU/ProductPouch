@@ -117,7 +117,12 @@ export default function CreateProductPage() {
       <Navbar />
 
       <Box maw={600} mx="auto" mt={20}>
-        <Stepper active={active} onStepClick={setActive}>
+        <Stepper
+          size="xs"
+          iconSize={32}
+          active={active}
+          onStepClick={setActive}
+        >
           <Stepper.Step label="Title">
             <TextInput
               label="Product Title"
@@ -146,6 +151,8 @@ export default function CreateProductPage() {
             <Textarea
               label="Product Description"
               placeholder="Enter product description"
+              autosize
+              maxRows={10}
               {...form.getInputProps("description")}
             />
           </Stepper.Step>
