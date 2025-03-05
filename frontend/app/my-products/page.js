@@ -1,45 +1,97 @@
 "use client";
 
-import Navbar from "@/components/Navbar";
 import { useState, useEffect } from "react";
 import {
   Container,
   Title,
-  Paper,
   Text,
   Button,
   Group,
   ActionIcon,
   Flex,
+  Paper,
+  Modal,
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
-import { useQuery } from "@apollo/client";
-import { GET_USER_PRODUCTS } from "../../graphql/mutations";
+import { useQuery, useMutation } from "@apollo/client";
+import { GET_USER_PRODUCTS, DELETE_PRODUCT } from "../../graphql/mutations";
 import { useRouter } from "next/navigation";
+import Navbar from "@/components/Navbar";
 
 export default function ProductsPage() {
-  // Get userId from localStorage
-  const [userId, setUserId] = useState(null);
   const router = useRouter();
+  const [userId, setUserId] = useState(null);
+  const [productToDelete, setProductToDelete] = useState(null);
 
+  // Move useEffect before the query hook
   useEffect(() => {
     // Get the token and user info from localStorage
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     setUserId(user.id || null);
   }, []);
 
+  // Delete mutation
+  const [deleteProduct] = useMutation(DELETE_PRODUCT, {
+    update(cache, { data: { deleteProduct } }) {
+      const existingProducts = cache.readQuery({
+        query: GET_USER_PRODUCTS,
+        variables: { userId },
+      });
+
+      cache.writeQuery({
+        query: GET_USER_PRODUCTS,
+        variables: { userId },
+        data: {
+          user: {
+            ...existingProducts.user,
+            owner: existingProducts.user.owner.filter(
+              (product) => product.id !== deleteProduct.id
+            ),
+          },
+        },
+      });
+    },
+  });
+
   // Execute the GraphQL query
   const { loading, error, data, refetch } = useQuery(GET_USER_PRODUCTS, {
     variables: { userId },
-    skip: !userId, // Skip the query until userId is available
+    skip: !userId,
   });
 
-  if (loading) return <Text>Loading products...</Text>;
-  if (error)
-    return <Text color="red">Error loading products: {error.message}</Text>;
+  // Handle product click
+  const handleProductClick = (product) => {
+    const queryString = new URLSearchParams({
+      title: product.title,
+      price: product.price,
+      rent_price: product.rent_price,
+      rent_period: product.rent_period,
+      status: product.status,
+      description: product.description,
+      categories: product.categories,
+    }).toString();
 
-  const products = data?.user?.owner || [];
+    router.push(`/edit-product/${product.id}?${queryString}`);
+  };
 
+  // Handle delete action
+  const handleActionClick = (product) => {
+    setProductToDelete(product);
+  };
+
+  // Confirm delete
+  const confirmDelete = () => {
+    if (productToDelete) {
+      deleteProduct({
+        variables: {
+          deleteProductId: productToDelete.id,
+        },
+      });
+      setProductToDelete(null);
+    }
+  };
+
+  // Formatting function
   const formatDate = (dateString) => {
     const timestamp = Number(dateString);
     const date = new Date(timestamp);
@@ -84,20 +136,15 @@ export default function ProductsPage() {
     return `${day}${getOrdinalSuffix(day)} ${months[month]} ${year}`;
   };
 
-  // To pass product info to route
-  const handleProductClick = (product) => {
-    const queryString = new URLSearchParams({
-      title: product.title,
-      price: product.price,
-      rent_price: product.rent_price,
-      rent_period: product.rent_period,
-      status: product.status,
-      description: product.description,
-      categories: product.categories,
-    }).toString();
+  // Render loading state
+  if (loading) return <Text>Loading products...</Text>;
 
-    router.push(`/edit-product/${product.id}?${queryString}`);
-  };
+  // Render error state
+  if (error)
+    return <Text color="red">Error loading products: {error.message}</Text>;
+
+  // Get products
+  const products = data?.user?.owner || [];
 
   return (
     <>
@@ -121,9 +168,15 @@ export default function ProductsPage() {
               style={{ cursor: "pointer" }}
               onClick={() => handleProductClick(product)}
             >
-              <Group position="apart" mb="xs">
+              <Group justify="space-between" mb="xs">
                 <Title order={3}>{product.title}</Title>
-                <ActionIcon color="gray">
+                <ActionIcon
+                  color="gray"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleActionClick(product);
+                  }}
+                >
                   <IconTrash size={18} />
                 </ActionIcon>
               </Group>
@@ -158,7 +211,7 @@ export default function ProductsPage() {
           ))
         )}
 
-        <Group position="right" mt="xl">
+        <Group justify="flex-end" mt="xl">
           <Button
             onClick={() => {
               router.push("/add-product");
@@ -168,6 +221,26 @@ export default function ProductsPage() {
           </Button>
         </Group>
       </Container>
+
+      <Modal
+        opened={!!productToDelete}
+        onClose={() => setProductToDelete(null)}
+        centered
+        withCloseButton={false}
+        size="xs"
+      >
+        <Text ta="center" mb="md">
+          Are you sure you want to delete this product?
+        </Text>
+        <Group justify="center">
+          <Button color="red" onClick={() => setProductToDelete(null)}>
+            No
+          </Button>
+          <Button color="violet" onClick={confirmDelete}>
+            Yes
+          </Button>
+        </Group>
+      </Modal>
     </>
   );
 }

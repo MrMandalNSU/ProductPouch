@@ -1,7 +1,7 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import {
   Container,
@@ -12,19 +12,35 @@ import {
   Modal,
   Group,
   Stack,
+  Tooltip,
 } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
+import { useMutation } from "@apollo/client";
+import {
+  BUY_PRODUCT,
+  UPDATE_PRODUCT,
+  CREATE_RENTAL,
+} from "../../../graphql/mutations";
 
 export default function SingleProductPage() {
   const { id } = useParams();
   const router = useRouter();
+  const params = useParams();
   const searchParams = useSearchParams();
   const [buyModalOpen, setBuyModalOpen] = useState(false);
   const [rentModalOpen, setRentModalOpen] = useState(false);
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    // Get the token and user info from localStorage
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    setUserId(user.id || null);
+  }, []);
 
   const product = {
+    id: Number(params.id),
     title: searchParams.get("title"),
     price: searchParams.get("price"),
     rent_price: searchParams.get("rent_price"),
@@ -32,16 +48,44 @@ export default function SingleProductPage() {
     status: searchParams.get("status"),
     description: searchParams.get("description"),
     categories: searchParams.get("categories"),
+    owner_id: Number(searchParams.get("owner_id")),
+    rental: JSON.parse(decodeURIComponent(searchParams.get("rental"))),
   };
 
   if (!product) return <Text>Loading product details...</Text>;
 
+  // Apollo mutation hooks
+  const [buyProduct, { loading }] = useMutation(BUY_PRODUCT, {
+    onCompleted: (data) => {
+      console.log("Product bought: ", data);
+      window.location.href = "/all-products";
+    },
+    onError: (error) => {
+      console.error("Error creating user:", error);
+      setError(error.message || "An error occurred during buy");
+    },
+  });
+
+  const [updateProduct] = useMutation(UPDATE_PRODUCT);
+  const [createRental] = useMutation(CREATE_RENTAL);
+
   const handleBuy = () => {
     setBuyModalOpen(false);
     alert(`You have bought ${product.title} for $${product.price}!`);
+
+    // Trigger mutation
+    buyProduct({
+      variables: {
+        updateProductId: product.id,
+        input: {
+          buyer_id: userId,
+          status: "sold",
+        },
+      },
+    });
   };
 
-  const handleRent = () => {
+  const handleRent = async () => {
     if (!fromDate || !toDate) {
       alert("Please select rental dates");
       return;
@@ -52,6 +96,46 @@ export default function SingleProductPage() {
         product.title
       } from ${fromDate.toLocaleDateString()} to ${toDate.toLocaleDateString()}!`
     );
+
+    try {
+      await updateProduct({
+        variables: {
+          updateProductId: product.id,
+          input: { status: "rented" },
+        },
+      });
+
+      await createRental({
+        variables: {
+          input: {
+            rent_from: fromDate,
+            rent_to: toDate,
+            product_id: product.id,
+            renter_id: userId,
+          },
+        },
+      });
+
+      // Redirect after successful rental
+      window.location.href = "/all-products";
+    } catch (error) {
+      console.error("Error renting product:", error);
+      setError(error.message || "An error occurred during rent");
+    }
+  };
+
+  // Function to check if a date is within any rental period
+  const isDateRented = (checkDate) => {
+    return product.rental.some((rental) => {
+      const rentFrom = new Date(rental.rent_from);
+      const rentTo = new Date(rental.rent_to);
+      return checkDate >= rentFrom && checkDate <= rentTo;
+    });
+  };
+
+  // Function to disable dates that are already rented
+  const shouldDisableDate = (date) => {
+    return isDateRented(date);
   };
 
   return (
@@ -90,12 +174,35 @@ export default function SingleProductPage() {
 
           {/* Action Buttons */}
           <Group position="right" mt="xl">
-            <Button color="blue" onClick={() => setBuyModalOpen(true)}>
-              Buy
-            </Button>
-            <Button color="orange" onClick={() => setRentModalOpen(true)}>
-              Rent
-            </Button>
+            <Tooltip
+              label="You cannot buy your own product"
+              disabled={userId !== product.owner_id}
+            >
+              <Button
+                color="blue"
+                onClick={() => setBuyModalOpen(true)}
+                disabled={
+                  userId === product.owner_id || product.status === "sold"
+                }
+              >
+                Buy
+              </Button>
+            </Tooltip>
+
+            <Tooltip
+              label="You cannot rent your own product"
+              disabled={userId !== product.owner_id}
+            >
+              <Button
+                color="orange"
+                onClick={() => setRentModalOpen(true)}
+                disabled={
+                  userId === product.owner_id || product.status === "sold"
+                }
+              >
+                Rent
+              </Button>
+            </Tooltip>
           </Group>
         </Paper>
 
@@ -136,6 +243,9 @@ export default function SingleProductPage() {
                 placeholder="Pick a start date"
                 valueFormat="DD/MM/YYYY"
                 clearable
+                // Disable dates that are already rented
+                excludeDate={shouldDisableDate}
+                minDate={new Date()}
               />
               <DatePickerInput
                 label="To"
@@ -144,6 +254,9 @@ export default function SingleProductPage() {
                 placeholder="Pick an end date"
                 valueFormat="DD/MM/YYYY"
                 clearable
+                // Disable dates that are already rented
+                excludeDate={shouldDisableDate}
+                minDate={fromDate || new Date()}
               />
             </Group>
           </Stack>
@@ -151,7 +264,22 @@ export default function SingleProductPage() {
             <Button variant="default" onClick={() => setRentModalOpen(false)}>
               Cancel
             </Button>
-            <Button color="orange" onClick={handleRent}>
+            <Button
+              color="orange"
+              onClick={handleRent}
+              // Disable confirm button if dates overlap with existing rentals
+              disabled={
+                !fromDate ||
+                !toDate ||
+                product.rental.some(
+                  (rental) =>
+                    (fromDate >= new Date(rental.rent_from) &&
+                      fromDate <= new Date(rental.rent_to)) ||
+                    (toDate >= new Date(rental.rent_from) &&
+                      toDate <= new Date(rental.rent_to))
+                )
+              }
+            >
               Confirm Rent
             </Button>
           </Group>

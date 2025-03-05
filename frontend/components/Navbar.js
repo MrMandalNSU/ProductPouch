@@ -26,6 +26,37 @@ export default function Navbar() {
       {/* Logo on the left */}
       <Logo />
 
+      <Group>
+        <Button
+          component="a"
+          color="violet"
+          variant="outline"
+          size="compact-md"
+          onClick={() => router.push("/all-products")}
+        >
+          All Products
+        </Button>
+        <Button
+          component="a"
+          color="violet"
+          variant="outline"
+          size="compact-md"
+          onClick={() => router.push("/my-products")}
+        >
+          My Products
+        </Button>
+
+        <Button
+          component="a"
+          color="violet"
+          variant="outline"
+          size="compact-md"
+          onClick={() => router.push("/my-products-history")}
+        >
+          My History
+        </Button>
+      </Group>
+
       {/* Logout button on the right */}
       <Button component="a" color="red" onClick={handleLogout}>
         Logout

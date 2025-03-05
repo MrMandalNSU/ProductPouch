@@ -77,6 +77,34 @@ export const UPDATE_PRODUCT = gql`
   }
 `;
 
+export const DELETE_PRODUCT = gql`
+  mutation DeleteProduct($deleteProductId: Int!) {
+    deleteProduct(id: $deleteProductId) {
+      id
+    }
+  }
+`;
+
+export const BUY_PRODUCT = gql`
+  mutation UpdateProduct($updateProductId: Int!, $input: UpdateProductInput!) {
+    updateProduct(id: $updateProductId, input: $input) {
+      buyer_id
+      status
+    }
+  }
+`;
+
+export const CREATE_RENTAL = gql`
+  mutation CreateRental($input: CreateRentalInput!) {
+    createRental(input: $input) {
+      product_id
+      rent_from
+      rent_to
+      renter_id
+    }
+  }
+`;
+
 export const GET_ALL_PRODUCTS = gql`
   query Products {
     products {
@@ -90,6 +118,7 @@ export const GET_ALL_PRODUCTS = gql`
       status
       views
       owner_id
+      buyer_id
       updatedAt
       createdAt
       owner {
@@ -105,11 +134,27 @@ export const GET_ALL_PRODUCTS = gql`
       rental {
         rent_from
         rent_to
-        renter {
-          first_name
-          email
-          phone
-        }
+        renter_id
+      }
+    }
+  }
+`;
+
+export const BOUGHT_PRODUCTS = gql`
+  query BoughtProducts($userId: Int!) {
+    user(id: $userId) {
+      buyer {
+        title
+        status
+        description
+        categories
+        rent_price
+        rent_period
+        price
+        id
+        views
+        createdAt
+        updatedAt
       }
     }
   }
