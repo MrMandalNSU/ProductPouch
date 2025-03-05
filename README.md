@@ -30,3 +30,4 @@ A simple interactive application featuring product buy, sell and rental function
 ## Project Demo
 
 - google drive link: `https://drive.google.com/drive/folders/1GLIY44sLaBanWwAKY8MRcXyIaQ3E1Jl5?usp=sharing`
+- alternatively, loom video link: `https://www.loom.com/share/5292763ab9344ed39ac5a3ab158b096d?sid=eca8f8f8-2a27-4df9-bb1c-c4e57a123791`
