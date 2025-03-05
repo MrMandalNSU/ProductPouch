@@ -31,6 +31,7 @@ export default function SingleProductPage() {
     rent_period: searchParams.get("rent_period"),
     status: searchParams.get("status"),
     description: searchParams.get("description"),
+    categories: searchParams.get("categories"),
   };
 
   if (!product) return <Text>Loading product details...</Text>;
@@ -60,6 +61,12 @@ export default function SingleProductPage() {
       <Container size="md" py="xl">
         <Paper withBorder p="md">
           <Title order={2}>{product.title}</Title>
+          <Text mt="sm">
+            Categories:{" "}
+            {Array.isArray(product.categories)
+              ? product.categories.join(", ")
+              : product.categories}
+          </Text>
           <Text mt="sm">{product.description}</Text>
           <Text mt="sm">Price: ${product.price}</Text>
           <Text mt="sm">

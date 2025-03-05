@@ -92,6 +92,7 @@ export default function ProductsPage() {
       rent_period: product.rent_period,
       status: product.status,
       description: product.description,
+      categories: product.categories,
     }).toString();
 
     router.push(`/product/${product.id}?${queryString}`);
