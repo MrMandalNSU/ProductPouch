@@ -124,6 +124,20 @@ export default function SingleProductPage() {
     }
   };
 
+  // Function to check if a date is within any rental period
+  const isDateRented = (checkDate) => {
+    return product.rental.some((rental) => {
+      const rentFrom = new Date(rental.rent_from);
+      const rentTo = new Date(rental.rent_to);
+      return checkDate >= rentFrom && checkDate <= rentTo;
+    });
+  };
+
+  // Function to disable dates that are already rented
+  const shouldDisableDate = (date) => {
+    return isDateRented(date);
+  };
+
   return (
     <>
       <Navbar />
@@ -229,6 +243,8 @@ export default function SingleProductPage() {
                 placeholder="Pick a start date"
                 valueFormat="DD/MM/YYYY"
                 clearable
+                // Disable dates that are already rented
+                excludeDate={shouldDisableDate}
               />
               <DatePickerInput
                 label="To"
@@ -237,6 +253,8 @@ export default function SingleProductPage() {
                 placeholder="Pick an end date"
                 valueFormat="DD/MM/YYYY"
                 clearable
+                // Disable dates that are already rented
+                excludeDate={shouldDisableDate}
               />
             </Group>
           </Stack>
@@ -244,7 +262,22 @@ export default function SingleProductPage() {
             <Button variant="default" onClick={() => setRentModalOpen(false)}>
               Cancel
             </Button>
-            <Button color="orange" onClick={handleRent}>
+            <Button
+              color="orange"
+              onClick={handleRent}
+              // Disable confirm button if dates overlap with existing rentals
+              disabled={
+                !fromDate ||
+                !toDate ||
+                product.rental.some(
+                  (rental) =>
+                    (fromDate >= new Date(rental.rent_from) &&
+                      fromDate <= new Date(rental.rent_to)) ||
+                    (toDate >= new Date(rental.rent_from) &&
+                      toDate <= new Date(rental.rent_to))
+                )
+              }
+            >
               Confirm Rent
             </Button>
           </Group>
