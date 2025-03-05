@@ -83,6 +83,20 @@ export default function ProductsPage() {
     return `${day}${getOrdinalSuffix(day)} ${months[month]} ${year}`;
   };
 
+  // To pass product info to route
+  const handleProductClick = (product) => {
+    const queryString = new URLSearchParams({
+      title: product.title,
+      price: product.price,
+      rent_price: product.rent_price,
+      rent_period: product.rent_period,
+      status: product.status,
+      description: product.description,
+    }).toString();
+
+    router.push(`/product/${product.id}?${queryString}`);
+  };
+
   return (
     <>
       <Navbar />
@@ -97,7 +111,14 @@ export default function ProductsPage() {
           <Text>No products found.</Text>
         ) : (
           products.map((product) => (
-            <Paper key={product.id} withBorder p="md" mb="md">
+            <Paper
+              key={product.id}
+              withBorder
+              p="md"
+              mb="md"
+              style={{ cursor: "pointer" }}
+              onClick={() => handleProductClick(product)}
+            >
               <Group position="apart" mb="xs">
                 <Title order={3}>{product.title}</Title>
               </Group>
