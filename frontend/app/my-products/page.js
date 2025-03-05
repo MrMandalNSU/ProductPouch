@@ -1,32 +1,55 @@
 "use client";
 
-import Navbar from "@/components/Navbar";
 import { useState, useEffect } from "react";
 import {
   Container,
   Title,
-  Paper,
   Text,
   Button,
   Group,
   ActionIcon,
   Flex,
+  Paper,
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
-import { useQuery } from "@apollo/client";
-import { GET_USER_PRODUCTS } from "../../graphql/mutations";
+import { useQuery, useMutation } from "@apollo/client";
+import { GET_USER_PRODUCTS, DELETE_PRODUCT } from "../../graphql/mutations";
 import { useRouter } from "next/navigation";
+import Navbar from "@/components/Navbar";
 
 export default function ProductsPage() {
-  // Get userId from localStorage
-  const [userId, setUserId] = useState(null);
   const router = useRouter();
+  const [userId, setUserId] = useState(null);
 
+  // Move useEffect before the query hook
   useEffect(() => {
     // Get the token and user info from localStorage
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     setUserId(user.id || null);
   }, []);
+
+  // Delete mutation
+  const [deleteProduct] = useMutation(DELETE_PRODUCT, {
+    update(cache, { data: { deleteProduct } }) {
+      const existingProducts = cache.readQuery({
+        query: GET_USER_PRODUCTS,
+        variables: { userId },
+      });
+
+      cache.writeQuery({
+        query: GET_USER_PRODUCTS,
+        variables: { userId },
+        data: {
+          user: {
+            ...existingProducts.user,
+            owner: existingProducts.user.owner.filter(
+              (product) => product.id !== deleteProduct.id
+            ),
+          },
+        },
+      });
+    },
+  });
 
   // Execute the GraphQL query
   const { loading, error, data, refetch } = useQuery(GET_USER_PRODUCTS, {
@@ -34,12 +57,31 @@ export default function ProductsPage() {
     skip: !userId, // Skip the query until userId is available
   });
 
-  if (loading) return <Text>Loading products...</Text>;
-  if (error)
-    return <Text color="red">Error loading products: {error.message}</Text>;
+  // Handle product click
+  const handleProductClick = (product) => {
+    const queryString = new URLSearchParams({
+      title: product.title,
+      price: product.price,
+      rent_price: product.rent_price,
+      rent_period: product.rent_period,
+      status: product.status,
+      description: product.description,
+      categories: product.categories,
+    }).toString();
 
-  const products = data?.user?.owner || [];
+    router.push(`/edit-product/${product.id}?${queryString}`);
+  };
 
+  // Handle delete action
+  const handleActionClick = (product) => {
+    deleteProduct({
+      variables: {
+        deleteProductId: product.id,
+      },
+    });
+  };
+
+  // Formatting function
   const formatDate = (dateString) => {
     const timestamp = Number(dateString);
     const date = new Date(timestamp);
@@ -84,20 +126,15 @@ export default function ProductsPage() {
     return `${day}${getOrdinalSuffix(day)} ${months[month]} ${year}`;
   };
 
-  // To pass product info to route
-  const handleProductClick = (product) => {
-    const queryString = new URLSearchParams({
-      title: product.title,
-      price: product.price,
-      rent_price: product.rent_price,
-      rent_period: product.rent_period,
-      status: product.status,
-      description: product.description,
-      categories: product.categories,
-    }).toString();
+  // Render loading state
+  if (loading) return <Text>Loading products...</Text>;
 
-    router.push(`/edit-product/${product.id}?${queryString}`);
-  };
+  // Render error state
+  if (error)
+    return <Text color="red">Error loading products: {error.message}</Text>;
+
+  // Get products
+  const products = data?.user?.owner || [];
 
   return (
     <>
@@ -121,9 +158,15 @@ export default function ProductsPage() {
               style={{ cursor: "pointer" }}
               onClick={() => handleProductClick(product)}
             >
-              <Group position="apart" mb="xs">
+              <Group justify="space-between" mb="xs">
                 <Title order={3}>{product.title}</Title>
-                <ActionIcon color="gray">
+                <ActionIcon
+                  color="gray"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleActionClick(product);
+                  }}
+                >
                   <IconTrash size={18} />
                 </ActionIcon>
               </Group>

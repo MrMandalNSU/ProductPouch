@@ -77,6 +77,14 @@ export const UPDATE_PRODUCT = gql`
   }
 `;
 
+export const DELETE_PRODUCT = gql`
+  mutation DeleteProduct($deleteProductId: Int!) {
+    deleteProduct(id: $deleteProductId) {
+      id
+    }
+  }
+`;
+
 export const GET_ALL_PRODUCTS = gql`
   query Products {
     products {
