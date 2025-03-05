@@ -95,6 +95,7 @@ const typeDefs = gql`
     rent_period: String
     status: String
     buyer_id: Int
+    views: Int
   }
 
   input CreateRentalInput {

@@ -32,6 +32,7 @@ export default function SingleProductPage() {
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     // Get the token and user info from localStorage
