@@ -50,6 +50,7 @@ export default function SingleProductPage() {
     categories: searchParams.get("categories"),
     owner_id: Number(searchParams.get("owner_id")),
     rental: JSON.parse(decodeURIComponent(searchParams.get("rental"))),
+    views: Number(searchParams.get("views")),
   };
 
   if (!product) return <Text>Loading product details...</Text>;
